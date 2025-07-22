@@ -60,7 +60,19 @@ if search_button and company_name:
     code = get_company_code(company_name)   # 企業コードを取得する関数
     if code:
         st.write(f"{company_name} のコードは {code} です")
+        with st.spinner("有価証券報告書PDFを取得中..."):
+            pdf_url, pdf_path = fetch_securities_report_pdf(code)
+        if pdf_url:
+            st.success("✅ PDFリンクを取得しました！")
+            st.write(f"PDFリンク: {pdf_url}")
+            st.write(f"PDFファイル名: {pdf_path}")
+            st.download_button(
+                label="PDFをダウンロード",
+                data=open(pdf_path, "rb").read(),
+                file_name=pdf_path,
+                mime="application/pdf"
+            )
+        else:
+            st.error("❌ PDFリンクが見つかりませんでした。")
     else:
         st.write("指定された企業名が辞書に存在しません。先に企業コードを登録してください。")
-
-    # 「www.nikkei.com」から対象企業のページを取得
