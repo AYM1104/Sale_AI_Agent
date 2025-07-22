@@ -122,7 +122,7 @@ with st.sidebar:
     search_button = st.button("有価証券報告書を検索")
 
 # メインUI
-st.title("有価証券報告書AIサマリー＆仮説立て")
+st.title("顧客理解AIエージェント")
 
 # セッションステートで出力内容を保持
 if 'summary' not in st.session_state:
@@ -157,7 +157,7 @@ if search_button and company_name:
 
                 # ソリューションマッチングAI提案
                 if st.session_state.hypothesis:
-                    with st.spinner("🛠 ソリューションマッチングAI出力中...(3/4)"):
+                    with st.spinner("💡 ソリューションマッチングAI出力中...(3/4)"):
                         st.session_state.matching_result = match_solutions(st.session_state.hypothesis, solutions)
 
                 # ヒアリング項目AI提案
@@ -175,14 +175,14 @@ if search_button and company_name:
                     st.session_state.hearing_items = hearing_response.text
 
             st.success("✅ PDFリンクを取得しました！")
-            st.write(f"PDFリンク: {pdf_url}")
-            st.write(f"PDFファイル名: {pdf_path}")
-            st.download_button(
-                label="PDFをダウンロード",
-                data=open(pdf_path, "rb").read(),
-                file_name=pdf_path,
-                mime="application/pdf"
-            )
+            # st.write(f"PDFリンク: {pdf_url}")
+            # st.write(f"PDFファイル名: {pdf_path}")
+            # st.download_button(
+            #     label="PDFをダウンロード",
+            #     data=open(pdf_path, "rb").read(),
+            #     file_name=pdf_path,
+            #     mime="application/pdf"
+            # )
         else:
             st.error("❌ PDFリンクが見つかりませんでした。")
     else:
