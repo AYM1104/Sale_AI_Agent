@@ -102,7 +102,6 @@ with st.sidebar:
 # メインUI
 st.title("有価証券報告書AIサマリー＆仮説立て")
 
-
 # セッションステートで出力内容を保持
 if 'summary' not in st.session_state:
     st.session_state.summary = None
@@ -111,6 +110,7 @@ if 'hypothesis' not in st.session_state:
 if 'hearing_items' not in st.session_state:
     st.session_state.hearing_items = None
 
+# 処理実行部分
 if search_button and company_name:
     code = get_company_code(company_name)
     if code:
@@ -129,23 +129,21 @@ if search_button and company_name:
                     model = GenerativeModel(model_name="gemini-2.5-pro")
                     response = model.generate_content(hypo_prompt)
                     st.session_state.hypothesis = response.text
-                    st.write("【DEBUG】hypothesis:", st.session_state.hypothesis)
 
                 # ヒアリング項目AI提案
                 with st.spinner("👂 ヒアリング項目出力中...(3/3)"):
                     with open("hearing_prompt.txt", "r", encoding="utf-8") as f:
                         hearing_template = f.read()
-                    # 企業規模・業界は現状空欄で渡す
                     hearing_prompt = hearing_template.replace("{company_name}", company_name)
-                    hearing_prompt = hearing_prompt.replace("{department_name}", department_name)
-                    hearing_prompt = hearing_prompt.replace("{position_name}", position_name)
-                    hearing_prompt = hearing_prompt.replace("{company_size}", "")
-                    hearing_prompt = hearing_prompt.replace("{industry}", "")
-                    hearing_prompt = hearing_prompt.replace("{hypothesis}", st.session_state.hypothesis)
+                    hearing_prompt = hearing_template.replace("{department_name}", department_name)
+                    hearing_prompt = hearing_template.replace("{position_name}", position_name)
+                    hearing_prompt = hearing_template.replace("{company_size}", "")
+                    hearing_prompt = hearing_template.replace("{industry}", "")
+                    hearing_prompt = hearing_template.replace("{hypothesis}", st.session_state.hypothesis)
                     model = GenerativeModel(model_name="gemini-2.5-pro")
                     hearing_response = model.generate_content(hearing_prompt)
                     st.session_state.hearing_items = hearing_response.text
-                    st.write("【DEBUG】hearing_items:", st.session_state.hearing_items)
+            
             st.success("✅ PDFリンクを取得しました！")
             st.write(f"PDFリンク: {pdf_url}")
             st.write(f"PDFファイル名: {pdf_path}")
@@ -160,18 +158,26 @@ if search_button and company_name:
     else:
         st.write("指定された企業名が辞書に存在しません。先に企業コードを登録してください。")
 
-# タブ切り替えで要約・仮説・ヒアリング項目を表示
-if st.session_state.summary or st.session_state.hypothesis or st.session_state.hearing_items:
-    tabs = st.tabs(["有価証券報告書要約", "仮説立て（担当者課題）", "ヒアリング項目提案"])
-    with tabs[0]:
-        if st.session_state.summary:
-            st.subheader("Gemini要約結果")
-            st.write(st.session_state.summary)
-    with tabs[1]:
-        if st.session_state.hypothesis:
-            st.subheader("AI仮説・担当者課題提案")
-            st.write(st.session_state.hypothesis)
-    with tabs[2]:
-        if st.session_state.hearing_items:
-            st.subheader("訪問時のヒアリング項目（AI提案）")
-            st.write(st.session_state.hearing_items)
+# タブ表示部分（常に表示）
+tabs = st.tabs(["有価証券報告書要約", "仮説立て（担当者課題）", "ヒアリング項目提案"])
+
+with tabs[0]:
+    if st.session_state.summary:
+        st.subheader("Gemini要約結果")
+        st.write(st.session_state.summary)
+    else:
+        st.info("企業名を入力して検索ボタンを押してください。")
+
+with tabs[1]:
+    if st.session_state.hypothesis:
+        st.subheader("AI仮説・担当者課題提案")
+        st.write(st.session_state.hypothesis)
+    else:
+        st.info("部署名と役職を入力して検索してください。")
+
+with tabs[2]:
+    if st.session_state.hearing_items:
+        st.subheader("訪問時のヒアリング項目（AI提案）")
+        st.write(st.session_state.hearing_items)
+    else:
+        st.info("部署名と役職を入力して検索してください。")
