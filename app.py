@@ -15,8 +15,8 @@ from google.generativeai import GenerativeModel
 import google.generativeai as genai
 
 # .envからAPIキーを取得
-load_dotenv()
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+# load_dotenv()
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 
 # Gemini APIキーを設定
 genai.configure(api_key=GOOGLE_API_KEY)
